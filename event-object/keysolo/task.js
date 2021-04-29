@@ -10,6 +10,8 @@ class Game {
     this.registerEvents();
   }
 
+  int = null;
+
   reset() {
     this.setNewWord();
     this.winsElement.textContent = 0;
@@ -17,13 +19,10 @@ class Game {
   }
 
   registerEvents() {
-    /*
-      TODO:
-      Написать обработчик события, который откликается
-      на каждый введённый символ.
-      В случае правильного ввода слова вызываем this.success()
-      При неправильном вводе символа - this.fail();
-     */
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Shift' || e.key === 'Control' || e.key === 'CapsLock') return;
+      (this.currentSymbol.textContent.toUpperCase() === String.fromCharCode(e.keyCode) || this.currentSymbol.textContent.toUpperCase().charCodeAt(0) === e.key.toUpperCase().charCodeAt(0)) ? this.success() : this.fail();
+    });
   }
 
   success() {
@@ -52,6 +51,23 @@ class Game {
     const word = this.getWord();
 
     this.renderWord(word);
+
+    clearInterval(this.int);
+    this.setTimer(word);
+  }
+
+  setTimer(word) {
+    let time = new Date();
+    time.setSeconds(word.length);
+    document.getElementById('timer').textContent = (new Date(time)).getSeconds();
+    this.int = setInterval(() => {
+      time -= 1000;
+      let seconds = (new Date(time)).getSeconds();
+      if (seconds === 0) {
+        this.fail();
+      }
+      document.getElementById('timer').textContent = (new Date(time)).getSeconds();
+    }, 1000);
   }
 
   getWord() {
@@ -66,7 +82,8 @@ class Game {
         'popcorn',
         'cinema',
         'love',
-        'javascript'
+        'javascript',
+        'я люблю kitkat'
       ],
       index = Math.floor(Math.random() * words.length);
 
